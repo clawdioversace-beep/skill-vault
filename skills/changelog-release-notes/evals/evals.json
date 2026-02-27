@@ -1,0 +1,76 @@
+{
+  "skill_name": "changelog-release-notes",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Generate release notes for v2.1.0 — we need to update the changelog and write something for our users",
+      "expected_output": "Both a developer CHANGELOG.md entry and user-facing release notes, derived from git history between the last tag and HEAD",
+      "files": [],
+      "expectations": [
+        "Runs git log to find commits since the last tag",
+        "Produces a developer CHANGELOG.md entry grouped by category (Added, Changed, Fixed, etc.)",
+        "Produces separate user-facing release notes in plain language",
+        "Developer version includes refactors and internal changes; user version excludes them",
+        "Breaking changes appear prominently in both formats",
+        "Each format has genuinely different tone and detail level"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Summarize this PR for the description",
+      "expected_output": "A concise PR summary with changes list, file counts, and testing notes",
+      "files": [],
+      "expectations": [
+        "Uses main..HEAD or detects the PR base branch",
+        "Starts with a 1-2 sentence summary of the PR purpose",
+        "Lists specific changes with file/line counts from git diff --stat",
+        "Includes testing notes",
+        "Factual tone without marketing language",
+        "Concise enough to paste directly into a PR description"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I need a stakeholder update — what did the engineering team ship this sprint?",
+      "expected_output": "An executive summary with 3-5 bullet points focused on business impact",
+      "files": [],
+      "expectations": [
+        "Determines appropriate git range (last 2 weeks or since last tag)",
+        "Produces maximum 5 bullet points",
+        "Each bullet explains business impact, not technical details",
+        "Includes a risk assessment line",
+        "Skips refactors, CI changes, test additions — only impactful items",
+        "Tone is crisp and results-focused"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Generate a changelog for the last 3 commits",
+      "expected_output": "A brief developer changelog covering exactly the last 3 commits",
+      "files": [],
+      "expectations": [
+        "Scopes git log to exactly 3 commits",
+        "Categorizes each commit correctly even if messages are freeform",
+        "Output is proportionally brief — no padding or filler",
+        "Still follows the grouped format (Added, Fixed, etc.)",
+        "Doesn't generate user or executive formats unless asked"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "We're about to release — give me the full package: changelog, release notes for users, and an executive summary",
+      "expected_output": "All three formats generated from the same git range, clearly separated, each with distinct tone",
+      "files": [],
+      "expectations": [
+        "Produces all three formats: developer, user, executive",
+        "All three cover the same commit range",
+        "Developer changelog is comprehensive and technical",
+        "User notes are plain language with no internal jargon",
+        "Executive summary is 3-5 bullets max",
+        "Breaking changes appear in all three formats",
+        "Internal-only changes (refactors, CI) appear only in developer changelog",
+        "Each format is clearly separated and labeled"
+      ]
+    }
+  ]
+}
