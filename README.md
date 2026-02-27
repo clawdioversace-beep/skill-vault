@@ -9,6 +9,7 @@ Every skill in this repo has evals, a quality-checked SKILL.md, and has been ver
 <!-- CATALOG:START - Auto-generated, do not edit -->
 | Skill | Category | Tier | Description |
 |-------|----------|------|-------------|
+| [changelog-release-notes](skills/changelog-release-notes/) | Developer Tools | Free | Generate changelogs, release notes, and summaries from git history — tailored to different |
 | [mega-refactor](skills/mega-refactor/) | Developer Tools | Premium | Plan and execute large-scale codebase refactors that span too many files for a single pass. |
 | [prompt-to-skill](skills/prompt-to-skill/) | Meta / Productivity | Free | Turn any prompt, workflow, or set of instructions into a persistent Claude skill with a slash command. |
 <!-- CATALOG:END -->
