@@ -37,7 +37,7 @@ else:
   # Extract tier from README.md if it exists
   tier="Free"
   if [ -f "$readme_md" ]; then
-    tier_line=$(grep -i "^## Tier" -A 1 "$readme_md" 2>/dev/null | tail -1 || echo "")
+    tier_line=$(awk '/^## Tier/{found=1; next} found && /^$/{next} found{print; exit}' "$readme_md")
     if echo "$tier_line" | grep -qi "premium"; then
       tier="Premium"
     elif echo "$tier_line" | grep -qi "enterprise"; then
@@ -48,7 +48,7 @@ else:
   # Extract category from README.md
   category="Uncategorized"
   if [ -f "$readme_md" ]; then
-    cat_line=$(grep -i "^## Category" -A 1 "$readme_md" 2>/dev/null | tail -1 || echo "")
+    cat_line=$(awk '/^## Category/{found=1; next} found && /^$/{next} found{print; exit}' "$readme_md")
     if [ -n "$cat_line" ]; then
       category="$cat_line"
     fi
