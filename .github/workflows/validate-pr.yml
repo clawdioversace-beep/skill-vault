@@ -1,0 +1,49 @@
+name: Validate Skill PR
+
+on:
+  pull_request:
+    paths:
+      - 'skills/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find changed skills
+        id: changed
+        run: |
+          SKILLS=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep "^skills/" | cut -d/ -f1-2 | sort -u)
+          echo "skills=$SKILLS" >> $GITHUB_OUTPUT
+          echo "Found changed skills: $SKILLS"
+
+      - name: Validate each skill
+        run: |
+          FAILED=0
+          for skill_dir in ${{ steps.changed.outputs.skills }}; do
+            echo "=== Validating $skill_dir ==="
+            if bash scripts/validate-skill.sh "$skill_dir"; then
+              echo "PASSED: $skill_dir"
+            else
+              echo "FAILED: $skill_dir"
+              FAILED=$((FAILED + 1))
+            fi
+            echo ""
+          done
+          if [ "$FAILED" -gt 0 ]; then
+            echo "::error::$FAILED skill(s) failed validation"
+            exit 1
+          fi
+
+      - name: Label PR
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['skill-submission', 'validated']
+            })

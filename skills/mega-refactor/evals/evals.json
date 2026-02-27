@@ -1,0 +1,78 @@
+{
+  "skill_name": "mega-refactor",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Rename UserService to AuthenticationService across this entire project",
+      "expected_output": "A refactoring plan showing all affected files grouped into dependency-ordered chunks, followed by chunk-by-chunk execution with test verification after each chunk, ending with a summary report",
+      "files": [],
+      "expectations": [
+        "Searches for UserService across the entire codebase before making any changes",
+        "Creates a plan with ordered chunks (definition first, then importers, then tests)",
+        "Presents the plan and waits for user approval before executing",
+        "Makes atomic commits after each chunk with descriptive messages",
+        "Runs tests after each chunk and stops if they fail",
+        "Does a final search for any remaining UserService references",
+        "Reports a summary with files modified and commits created"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "This codebase has a lot of duplicate validation logic scattered across controllers. Can you consolidate it into a shared validation module?",
+      "expected_output": "Analysis of duplicated validation patterns, a plan to extract and centralize them, and chunk-by-chunk execution",
+      "files": [],
+      "expectations": [
+        "Maps all validation logic across the codebase using Grep/Glob",
+        "Identifies common patterns and groups them",
+        "Plans extraction: create shared module first, then update consumers chunk-by-chunk",
+        "Each chunk replaces inline validation with imports from the shared module",
+        "Tests pass after every chunk",
+        "Does not change validation behavior — only structure"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Migrate all our API endpoints from Express-style callbacks to async/await",
+      "expected_output": "A dependency-ordered plan covering all route files, middleware, and error handlers, executed in chunks",
+      "files": [],
+      "expectations": [
+        "Searches for callback patterns (req, res, next) and .then() chains",
+        "Plans chunks so middleware migrates before routes that depend on it",
+        "Handles error handling pattern changes (try/catch replacing error callbacks)",
+        "Updates tests that mock callback-style handlers",
+        "Runs tests after each chunk",
+        "Reports total files migrated and any remaining callback patterns"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I need to move the entire /src/modules/payments/ directory to /packages/payment-service/src/ and update every import in the monorepo",
+      "expected_output": "A plan that handles file moves, import updates across the monorepo, and package boundary setup, executed in safe chunks",
+      "files": [],
+      "expectations": [
+        "Maps every file that imports from the payments module",
+        "Plans directory structure creation before moving files",
+        "Updates import paths across the monorepo in dependency order",
+        "Handles re-exports or barrel files if they exist",
+        "Checks for hardcoded path strings, not just import statements",
+        "Verifies no circular dependencies are introduced",
+        "Each chunk results in a passing test suite"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Refactor the user authentication module — it's a mess and I want it cleaned up. The module is about 15 files across 3 directories.",
+      "expected_output": "Analysis of current structure, identification of specific issues, a refactoring plan, and clean execution",
+      "files": [],
+      "expectations": [
+        "Reads all 15 files before proposing changes",
+        "Identifies concrete issues (not vague 'improvements')",
+        "Creates a specific plan — not just 'clean up the code'",
+        "Chunks are scoped to specific concerns (separate auth logic from route handling, etc.)",
+        "Asks the user to confirm the refactoring goals before executing",
+        "Does not add features or change behavior during refactoring",
+        "Reports what was improved and what might need further attention"
+      ]
+    }
+  ]
+}

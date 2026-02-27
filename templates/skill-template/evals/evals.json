@@ -1,0 +1,36 @@
+{
+  "skill_name": "your-skill-name",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Realistic user prompt — happy path",
+      "expected_output": "Description of what success looks like",
+      "files": [],
+      "expectations": [
+        "Specific checkable outcome 1",
+        "Specific checkable outcome 2",
+        "Specific checkable outcome 3"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Realistic user prompt — different use case",
+      "expected_output": "Description of what success looks like",
+      "files": [],
+      "expectations": [
+        "Specific checkable outcome 1",
+        "Specific checkable outcome 2"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Realistic user prompt — edge case",
+      "expected_output": "Description of what success looks like",
+      "files": [],
+      "expectations": [
+        "Specific checkable outcome 1",
+        "Handles the edge case correctly"
+      ]
+    }
+  ]
+}

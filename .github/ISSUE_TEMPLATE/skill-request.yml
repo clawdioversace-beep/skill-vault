@@ -1,0 +1,36 @@
+name: Skill Request
+description: Suggest a new skill for the vault
+title: "[Request] "
+labels: ["skill-request"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What should this skill do?
+      description: Describe the skill in plain language
+      placeholder: "I want a skill that..."
+    validations:
+      required: true
+  - type: textarea
+    id: demand
+    attributes:
+      label: Why do you need it?
+      description: Where have you seen others ask for this? Links to Reddit/GitHub/X posts help.
+      placeholder: "I saw people asking for this on..."
+    validations:
+      required: false
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Developer Tools
+        - Productivity
+        - Content & Marketing
+        - Data & Analysis
+        - Business Ops
+        - Design
+        - DevOps / Cloud
+        - Other
+    validations:
+      required: true
