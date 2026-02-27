@@ -9,8 +9,8 @@ Every skill in this repo has evals, a quality-checked SKILL.md, and has been ver
 <!-- CATALOG:START - Auto-generated, do not edit -->
 | Skill | Category | Tier | Description |
 |-------|----------|------|-------------|
-| [mega-refactor](skills/mega-refactor/) | Developer Tools | Premium | Plan and execute large-scale codebase refactors — chunked, dependency-ordered, verified after every step |
-| [prompt-to-skill](skills/prompt-to-skill/) | Meta / Productivity | Free | Turn any prompt or workflow into a persistent Claude skill with a slash command |
+| [mega-refactor](skills/mega-refactor/) | Uncategorized | Free | Plan and execute large-scale codebase refactors that span too many files for a single pass. |
+| [prompt-to-skill](skills/prompt-to-skill/) | Uncategorized | Free | Turn any prompt, workflow, or set of instructions into a persistent Claude skill with a slash command. |
 <!-- CATALOG:END -->
 
 ## Install a Skill
