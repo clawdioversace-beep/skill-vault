@@ -59,6 +59,42 @@ jobs:
             echo "${{ steps.compose.outputs.tweet }}"
           fi
 
+      - name: Check milestone
+        id: milestone
+        run: |
+          TOTAL=$(ls -d skills/*/ 2>/dev/null | wc -l | tr -d ' ')
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          # Only tweet at specific milestones
+          case "$TOTAL" in
+            10|25|50|100|250|500|1000|2500|5000|10000|25000|50000|100000|1000000)
+              echo "hit=true" >> $GITHUB_OUTPUT
+              echo "Milestone hit: $TOTAL skills!"
+              ;;
+            *)
+              echo "hit=false" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: Post milestone tweet
+        if: steps.milestone.outputs.hit == 'true'
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+        run: |
+          TOTAL=${{ steps.milestone.outputs.total }}
+          TWEET="Skill Vault just hit ${TOTAL} curated skills.
+
+Every one tested with evals. No junk.
+
+Browse & contribute: https://github.com/clawdioversace-beep/skill-vault
+
+#ClaudeCode #AI #OpenSource"
+          if [ -n "$X_API_KEY" ]; then
+            bash scripts/post-to-x.sh "$TWEET"
+          fi
+
       - name: Notify Telegram
         if: steps.detect.outputs.found == 'true' && vars.TELEGRAM_ENABLED == 'true'
         env:
