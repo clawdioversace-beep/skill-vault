@@ -1,0 +1,73 @@
+name: Announce New Skill
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/*/SKILL.md'
+
+jobs:
+  announce:
+    runs-on: ubuntu-latest
+    # Only runs if X API secrets are configured
+    if: ${{ vars.MARKETING_ENABLED == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need previous commit to detect new skills
+
+      - name: Find new skills
+        id: detect
+        run: |
+          # Get skill directories with new SKILL.md files in this push
+          NEW=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- 'skills/*/SKILL.md' | head -1)
+          if [ -n "$NEW" ]; then
+            SKILL_DIR=$(dirname "$NEW")
+            echo "skill_dir=$SKILL_DIR" >> $GITHUB_OUTPUT
+            echo "found=true" >> $GITHUB_OUTPUT
+            echo "New skill detected: $SKILL_DIR"
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+            echo "No new skills in this push"
+          fi
+
+      - name: Compose tweet
+        if: steps.detect.outputs.found == 'true'
+        id: compose
+        run: |
+          TWEET=$(bash scripts/compose-skill-tweet.sh "${{ steps.detect.outputs.skill_dir }}")
+          echo "tweet<<EOF" >> $GITHUB_OUTPUT
+          echo "$TWEET" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "--- Tweet preview ---"
+          echo "$TWEET"
+          echo "--- ${#TWEET} chars ---"
+
+      - name: Post to X
+        if: steps.detect.outputs.found == 'true'
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+        run: |
+          if [ -n "$X_API_KEY" ]; then
+            bash scripts/post-to-x.sh "${{ steps.compose.outputs.tweet }}"
+          else
+            echo "X API secrets not configured — skipping tweet"
+            echo "Would have posted:"
+            echo "${{ steps.compose.outputs.tweet }}"
+          fi
+
+      - name: Notify Telegram
+        if: steps.detect.outputs.found == 'true' && vars.TELEGRAM_ENABLED == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          SKILL_NAME=$(basename "${{ steps.detect.outputs.skill_dir }}")
+          MSG="New skill shipped to skill-vault: ${SKILL_NAME}%0A%0A${{ steps.compose.outputs.tweet }}"
+          curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=${MSG}" \
+            -d "parse_mode=HTML" || echo "Telegram notification failed (non-blocking)"

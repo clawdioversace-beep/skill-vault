@@ -1,0 +1,82 @@
+name: Weekly Digest
+
+on:
+  schedule:
+    # Every Monday at 9am UTC (5pm MYT)
+    - cron: '0 9 * * 1'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    if: ${{ vars.MARKETING_ENABLED == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git log
+
+      - name: Compose digest
+        id: digest
+        run: |
+          TWEET=$(bash scripts/compose-weekly-digest.sh)
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ] || [ -z "$TWEET" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "No new skills this week — skipping digest"
+            exit 0
+          fi
+          echo "skip=false" >> $GITHUB_OUTPUT
+          echo "tweet<<EOF" >> $GITHUB_OUTPUT
+          echo "$TWEET" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Capture Reddit draft if generated
+          if [ -f /tmp/weekly-digest-reddit.md ]; then
+            echo "reddit<<EOF" >> $GITHUB_OUTPUT
+            cat /tmp/weekly-digest-reddit.md >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
+          echo "--- Tweet preview ---"
+          echo "$TWEET"
+
+      - name: Post tweet
+        if: steps.digest.outputs.skip != 'true'
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+        run: |
+          if [ -n "$X_API_KEY" ]; then
+            bash scripts/post-to-x.sh "${{ steps.digest.outputs.tweet }}"
+          else
+            echo "X API secrets not configured — skipping tweet"
+          fi
+
+      - name: Save Reddit draft as artifact
+        if: steps.digest.outputs.skip != 'true'
+        run: |
+          mkdir -p /tmp/artifacts
+          if [ -f /tmp/weekly-digest-reddit.md ]; then
+            cp /tmp/weekly-digest-reddit.md /tmp/artifacts/
+          fi
+
+      - name: Upload Reddit draft
+        if: steps.digest.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-digest-reddit
+          path: /tmp/artifacts/weekly-digest-reddit.md
+          retention-days: 7
+
+      - name: Notify Telegram
+        if: steps.digest.outputs.skip != 'true' && vars.TELEGRAM_ENABLED == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          MSG="Weekly Digest ready:%0A%0A${{ steps.digest.outputs.tweet }}%0A%0AReddit draft saved as workflow artifact."
+          curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=${MSG}" || echo "Telegram notification failed (non-blocking)"
