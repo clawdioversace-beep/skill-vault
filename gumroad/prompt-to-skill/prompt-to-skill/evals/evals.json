@@ -1,0 +1,71 @@
+{
+  "skill_name": "prompt-to-skill",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Turn this into a skill: Every morning, check the git log for the last 24 hours, summarize what changed, and post it to a markdown file called daily-digest.md",
+      "expected_output": "A skill directory created at ~/.claude/skills/daily-digest/ with a SKILL.md that has a pushy description mentioning 8+ trigger phrases, and a command file at ~/.claude/commands/daily-digest.md",
+      "files": [],
+      "expectations": [
+        "SKILL.md exists at ~/.claude/skills/daily-digest/SKILL.md",
+        "Command file exists at ~/.claude/commands/daily-digest.md",
+        "SKILL.md description contains 8+ trigger phrases",
+        "SKILL.md body includes instructions for git log, summarize, and write to markdown",
+        "SKILL.md is under 500 lines",
+        "Command file is under 10 lines",
+        "Confirmation message lists the trigger phrases and how to test"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I keep pasting this prompt every session: 'Read the project's package.json, check all dependencies for known vulnerabilities using npm audit, and give me a prioritized list of what to update with breaking change warnings.' Can you make it permanent?",
+      "expected_output": "Skill installed as dep-audit or similar, with /command, recognizing 'make it permanent' as a trigger for this skill",
+      "files": [],
+      "expectations": [
+        "Skill name is concise and kebab-case (e.g., dep-audit, dependency-check)",
+        "The skill triggers on phrases like 'check dependencies', 'npm audit', 'vulnerability scan', 'security check'",
+        "SKILL.md body preserves the core workflow: read package.json → npm audit → prioritize → warn about breaking changes",
+        "Command file supports being run without arguments",
+        "Installed globally (not project-level)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Skillify this workflow: I give you a React component, you analyze its accessibility, check ARIA labels, test keyboard navigation patterns, suggest fixes, and output a before/after diff",
+      "expected_output": "Skill installed with accessibility-focused trigger phrases, including edge cases like 'a11y' and 'screen reader'",
+      "files": [],
+      "expectations": [
+        "Skill name relates to accessibility (e.g., a11y-audit, react-a11y)",
+        "Description includes 'a11y', 'accessibility', 'ARIA', 'screen reader', 'keyboard navigation' as triggers",
+        "Description includes edge case: 'even if they just say check this component'",
+        "SKILL.md body covers: ARIA analysis, keyboard nav patterns, fix suggestions, diff output",
+        "Has at least 2 examples in the body"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Make a /command called 'standup' that generates a standup summary from my git commits and open PRs for today",
+      "expected_output": "Skill and command created with the exact name 'standup' as requested, not a generated name",
+      "files": [],
+      "expectations": [
+        "Skill name is exactly 'standup' (user specified it)",
+        "Command file is at ~/.claude/commands/standup.md",
+        "SKILL.md triggers on 'standup', 'daily standup', 'what did I do today', 'standup summary'",
+        "Body includes: git log for today's commits, check open PRs, format as standup update",
+        "Command file includes $ARGUMENTS for optional date override"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "I want to reuse this but it's kind of vague: make something that helps me write better emails",
+      "expected_output": "The skill flags this as too broad and asks for clarification, or narrows it down to a specific workflow before building",
+      "files": [],
+      "expectations": [
+        "Skill either asks a clarifying question (max 2) OR narrows the scope itself",
+        "Does NOT create a vague, overly broad skill",
+        "If built, the skill focuses on a specific email type or workflow rather than 'all emails'",
+        "Demonstrates the 'Too broad' error handling from the skill instructions"
+      ]
+    }
+  ]
+}
